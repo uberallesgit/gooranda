@@ -65,7 +65,18 @@ def make_output_sheet(message,bs_name,RDB,markup):
                                           f"Адрес: {RDB[bs_name]['address']}\n"
                                           f"Координаты: {RDB[bs_name]['coordinates']}\n"
                                           f"Конструктивный тип сайта: {RDB[bs_name]['constructional_type']}\n"
-                                          # f"Ответственный: {RDB[bs_name]['responcible']}\n",
+                                          f"Ответственный: {find_responcible(RDB,bs_name)}\n",
+                         reply_markup=yandex_markup(bs_name,RDB))
+    except Exception as ex:
+        print(ex)
+
+def make_output_arc_sheet(message,bs_name,RDB,markup):
+    try:
+        bot.send_message(message.chat.id, f"------ {bs_name} ------\n"
+                                          f"КТК формат:  {RDB[bs_name]['arc_id']}\n"
+                                          f"Адрес: {RDB[bs_name]['address']}\n"
+                                          f"Координаты: {RDB[bs_name]['coordinates']}\n"
+                                          f"Конструктивный тип сайта: {RDB[bs_name]['constructional_type']}\n"
                                           f"Ответственный: {find_responcible(RDB,bs_name)}\n",
                          reply_markup=yandex_markup(bs_name,RDB))
     except Exception as ex:
@@ -84,22 +95,10 @@ def find_bs(message):
             ktk_cell = RDB[bs_name]["arc_id"]
             if ktk_cell != None:
                 print(ktk_cell)
+                if ktk_bs_name[3:] in ktk_cell:
+                    make_output_arc_sheet(message, bs_name, RDB, markup=yandex_markup(bs_name, RDB))
 
-                if len(ktk_bs_name.split()) > 1:
-                    for bs in (ktk_bs_name.split()):
-                        ktk_bs_name = bs
-
-                        if ktk_bs_name[3:] in ktk_cell:
-                            bs_name = bs
-                            make_output_sheet(message, bs_name, RDB, markup=yandex_markup(bs_name, RDB))
-
-                    if ktk_bs_name[3:] in ktk_cell:
-                        bs_name = bs
-                        make_output_sheet(message, bs_name, RDB, markup=yandex_markup(bs_name, RDB))
-
-
-    print('isalpha : ', "".join(message.text.split()).isalpha())
-    if "".join(message.text.split()).isalpha():
+    elif "".join(message.text.split()).isalpha():
         bs_name = message.text.upper()
         if len(bs_name.split()) > 1:
             keywords = []

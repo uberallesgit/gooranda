@@ -8,7 +8,7 @@ import operator
 GOORANDA = "6001130506:AAFNMXUh-iE3zdSq7PK2cpWWg4JFg_swwwg"
 JARVIS = "6357305111:AAHzb68csA1ojiDn620m7FFvDXcTP9tYu_s"
 
-CURRENT_BOT = JARVIS
+CURRENT_BOT = GOORANDA
 per_message = 1
 bs_name = ""
 # cwd = os.getcwd()
@@ -40,7 +40,6 @@ def find_responcible(RDB,bs_name):
     for part in address.replace("."," ").replace(","," ").replace("-"," ").split():
         print(bs_name[:2])
         if bs_name[:2] == "SE":
-
             responcible = "Гречишников Анатолий"
             break
         elif part.lower() in Djankoysky:
@@ -64,23 +63,14 @@ def make_output_sheet(message,bs_name,RDB,markup):
                                           f"КТК формат:  {RDB[bs_name]['arc_id']}\n"
                                           f"Адрес: {RDB[bs_name]['address']}\n"
                                           f"Координаты: {RDB[bs_name]['coordinates']}\n"
+                                          f"Арендодатель: {RDB[bs_name]['rent']}\n"
                                           f"Конструктивный тип сайта: {RDB[bs_name]['constructional_type']}\n"
                                           f"Ответственный: {find_responcible(RDB,bs_name)}\n",
                          reply_markup=yandex_markup(bs_name,RDB))
     except Exception as ex:
         print(ex)
 
-def make_output_arc_sheet(message,bs_name,RDB,markup):
-    try:
-        bot.send_message(message.chat.id, f"------ {bs_name} ------\n"
-                                          f"КТК формат:  {RDB[bs_name]['arc_id']}\n"
-                                          f"Адрес: {RDB[bs_name]['address']}\n"
-                                          f"Координаты: {RDB[bs_name]['coordinates']}\n"
-                                          f"Конструктивный тип сайта: {RDB[bs_name]['constructional_type']}\n"
-                                          f"Ответственный: {find_responcible(RDB,bs_name)}\n",
-                         reply_markup=yandex_markup(bs_name,RDB))
-    except Exception as ex:
-        print(ex)
+
 
 print("Бот Запущен")
 
@@ -96,7 +86,7 @@ def find_bs(message):
             if ktk_cell != None:
                 print(ktk_cell)
                 if ktk_bs_name[3:] in ktk_cell:
-                    make_output_arc_sheet(message, bs_name, RDB, markup=yandex_markup(bs_name, RDB))
+                    make_output_sheet(message, bs_name, RDB, markup=yandex_markup(bs_name, RDB))
 
     elif "".join(message.text.split()).isalpha():
         bs_name = message.text.upper()
@@ -140,16 +130,25 @@ def find_bs(message):
             if bs_name in RDB:
                 make_output_sheet(message, bs_name, RDB, markup=yandex_markup(bs_name, RDB))
             else:
-                bs_name = add_preffix(bs_name)
-                make_output_sheet(message, bs_name, RDB, markup=yandex_markup(bs_name, RDB))
+                try:
+                    bs_name = add_preffix(bs_name)
+                    make_output_sheet(message, bs_name, RDB, markup=yandex_markup(bs_name, RDB))
+                except Exception as ex:
+                    bot.send_message(message.chat.id,
+                                     f"{bs} Это какой -то рандомный набор цифр. Сконцентрируйся и попробуй еще раз..")
+
+
 
     elif len(message.text.split()) == 1:
         bs_name = message.text.upper()
         if bs_name in RDB:
             make_output_sheet(message, bs_name, RDB, markup=yandex_markup(bs_name, RDB))
         else:
-            bs_name = add_preffix(bs_name)
-            make_output_sheet(message, bs_name, RDB, markup=yandex_markup(bs_name, RDB))
+            try:
+                bs_name = add_preffix(bs_name)
+                make_output_sheet(message, bs_name, RDB, markup=yandex_markup(bs_name, RDB))
+            except Exception as ex:
+                bot.send_message(message.chat.id,f"{bs_name[3:]} Это какой -то рандомный набор цифр. Сконцентрируйся и попробуй еще раз..")
 
 
 try:
